@@ -81,7 +81,7 @@ export default async function handler(req: NextApiRequest) {
         ))
     }
 
-    return new Response(
+    return cors(req, new Response(
         JSON.stringify(result),
         {
             status: 200,
@@ -92,7 +92,7 @@ export default async function handler(req: NextApiRequest) {
                 'content-type': 'application/json',
             },
         }
-    )
+    ))
 }
 
 async function getBlockchainScanSourceCodeRequestURLByChainId(chainId: string, contractAddress: string): Promise<string> {
