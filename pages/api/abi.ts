@@ -126,7 +126,7 @@ async function getBlockchainScanSourceCodeRequestURLByChainId(chainId: string, c
 }
 
 // Get Contract Source Code for Verified Contract Source Codes
-async function getContractSourceCode(chainId: string, contractAddress: string): Promise<Contract | null> {
+async function getContractSourceCode(chainId: string, contractAddress: string, contractName?: string): Promise<Contract | null> {
     const url = await getBlockchainScanSourceCodeRequestURLByChainId(chainId, contractAddress);
     const response = await fetch(url);
 
@@ -146,13 +146,13 @@ async function getContractSourceCode(chainId: string, contractAddress: string): 
         && result.Implementation.toLowerCase() !== contractAddress.toLowerCase()
     ) {
         // proxy contract
-        return getContractSourceCode(chainId, result.Implementation);
+        return getContractSourceCode(chainId, result.Implementation, result.ContractName);
     }
 
     let abi: ContractABI[] = JSON.parse(result.ABI);
 
     return {
-        ContractName: result.ContractName,
+        ContractName: contractName ?? result.ContractName,
         ABI: abi.filter(b => {
             if (b.type === 'constructor') {
                 return false;
