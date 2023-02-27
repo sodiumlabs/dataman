@@ -132,7 +132,6 @@ async function getContractSourceCode(chainId: string, contractAddress: string, c
 
     const json = await response.json();
 
-    console.debug('getContractSourceCode', json)
     if (json.status == '0') {
         throw new Error(`Failed to get contract source code, chainId: ${chainId}, contractAddress: ${contractAddress}, status: ${json.status}, message: ${json.message}, result: ${json.result}`);
     }
@@ -153,15 +152,7 @@ async function getContractSourceCode(chainId: string, contractAddress: string, c
 
     return {
         ContractName: contractName ?? result.ContractName,
-        ABI: abi.filter(b => {
-            if (b.type === 'constructor') {
-                return false;
-            }
-            if (b.stateMutability === 'pure' || b.stateMutability === 'view') {
-                return false;
-            }
-            return true;
-        }),
+        ABI: abi,
         Implementation: result.Implementation,
     };
 }
