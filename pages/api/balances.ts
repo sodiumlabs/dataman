@@ -72,8 +72,8 @@ export default async function handler(req: NextApiRequest) {
       status: 200,
       headers: {
         // cache for 2 seconds
-        // stale-while-revalidate: 5 seconds
-        'cache-control': 's-maxage=2, stale-while-revalidate=5',
+        // stale-while-revalidate: 4 seconds
+        'cache-control': 's-maxage=2, stale-while-revalidate=4',
         'content-type': 'application/json',
       },
     }
