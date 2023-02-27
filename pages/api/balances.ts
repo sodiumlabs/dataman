@@ -29,6 +29,8 @@ export default async function handler(req: NextApiRequest) {
       {
         status: 400,
         headers: {
+          // cache for 1 hour
+          'cache-control': 's-maxage=3600',
           'content-type': 'application/json',
         },
       }
@@ -69,6 +71,9 @@ export default async function handler(req: NextApiRequest) {
     {
       status: 200,
       headers: {
+        // cache for 2 seconds
+        // stale-while-revalidate: 5 seconds
+        'cache-control': 's-maxage=2, stale-while-revalidate=5',
         'content-type': 'application/json',
       },
     }
