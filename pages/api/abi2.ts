@@ -1,23 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest } from 'next'
-import mumbaiTokenList from '../../tokenlist/mumbai.json';
-import polygonTokenList from '../../tokenlist/polygon.json';
 import { get } from '@vercel/edge-config';
-import { defaultAbiCoder } from '@ethersproject/abi';
+import { JsonFragment } from '@ethersproject/abi';
+import cors from '../../xcors';
 
 export const config = {
     runtime: "edge",
 }
 
-type ContractABI = {
-    name: string;
-    type: string;
-    input: {
-        name: string;
-        type: string;
-    }[];
-    stateMutability: 'payable' | 'nonpayable' | 'view' | 'pure';
-}
+type ContractABI = JsonFragment;
 
 type Contract = {
     ContractName: string;
@@ -37,7 +28,7 @@ export default async function handler(req: NextApiRequest) {
     const contractAddress = searchParams.get("contractAddress");
 
     if (!chainId || !contractAddress) {
-        return new Response(
+        return cors(req, new Response(
             JSON.stringify({
                 error: 'Missing chainId or contractAddress',
             }),
@@ -49,7 +40,7 @@ export default async function handler(req: NextApiRequest) {
                     'content-type': 'application/json',
                 },
             }
-        )
+        ))
     }
 
     const queue = [
@@ -75,7 +66,7 @@ export default async function handler(req: NextApiRequest) {
     }
 
     if (result === null) {
-        return new Response(
+        return cors(req, new Response(
             JSON.stringify({
                 error: 'Contract not found',
             }),
@@ -87,7 +78,7 @@ export default async function handler(req: NextApiRequest) {
                     'content-type': 'application/json',
                 },
             }
-        )
+        ))
     }
 
     return new Response(

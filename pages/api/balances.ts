@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest } from 'next'
 import { get } from '@vercel/edge-config';
+import cors from '../../xcors';
 
 export const config = {
   runtime: "edge",
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest) {
   const walletAddress = searchParams.get("walletAddress");
 
   if (!chainId || !walletAddress) {
-    return new Response(
+    return cors(req, new Response(
       JSON.stringify({
         error: 'Missing chainId or walletAddress',
       }),
@@ -34,7 +35,7 @@ export default async function handler(req: NextApiRequest) {
           'content-type': 'application/json',
         },
       }
-    )
+    ))
   }
 
   // 优先使用Convalenthq
@@ -66,7 +67,7 @@ export default async function handler(req: NextApiRequest) {
     reportError(latestError);
   }
 
-  return new Response(
+  return cors(req, new Response(
     JSON.stringify(result),
     {
       status: 200,
@@ -77,7 +78,7 @@ export default async function handler(req: NextApiRequest) {
         'content-type': 'application/json',
       },
     }
-  )
+  ))
 }
 
 async function fallbackMoralis(chainId: string, walletAddress: string): Promise<TokenBalances> {

@@ -4,6 +4,7 @@ import mumbaiTokenList from '../../tokenlist/mumbai.json';
 import polygonTokenList from '../../tokenlist/polygon.json';
 import { get } from '@vercel/edge-config';
 import { defaultAbiCoder } from '@ethersproject/abi';
+import cors from '../../xcors';
 
 export const config = {
     runtime: "edge",
@@ -39,7 +40,7 @@ export default async function handler(req: NextApiRequest) {
     const tokenAddress = searchParams.get("tokenAddress");
 
     if (!chainId || !tokenAddress) {
-        return new Response(
+        return cors(req, new Response(
             JSON.stringify({
                 error: 'Missing chainId or tokenAddress',
             }),
@@ -51,7 +52,7 @@ export default async function handler(req: NextApiRequest) {
                     'content-type': 'application/json',
                 },
             }
-        )
+        ))
     }
 
     const queue = [
@@ -77,7 +78,7 @@ export default async function handler(req: NextApiRequest) {
         throw latestError;
     }
 
-    return new Response(
+    return cors(req, new Response(
         JSON.stringify(result),
         {
             status: 200,
@@ -88,7 +89,7 @@ export default async function handler(req: NextApiRequest) {
                 'content-type': 'application/json',
             },
         }
-    )
+    ))
 }
 
 
