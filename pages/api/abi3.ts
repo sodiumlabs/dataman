@@ -79,7 +79,7 @@ export default async function handler(req: NextApiRequest) {
                 },
             }
         ))
-    }
+    } 
 
     return cors(req, new Response(
         JSON.stringify(result),
