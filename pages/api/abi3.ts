@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest) {
 
     if (!success) {
         // send error to sentry
-        throw latestError;
+        console.error(latestError);
     }
 
     if (result === null) {
