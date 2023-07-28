@@ -3,6 +3,7 @@ import type { NextApiRequest } from 'next'
 import { get } from '@vercel/edge-config';
 import { JsonFragment } from '@ethersproject/abi';
 import cors from '../../xcors';
+import LumiFiContracts from '../../contractList/lumifi';
 
 export const config = {
     runtime: "edge",
@@ -44,6 +45,7 @@ export default async function handler(req: NextApiRequest) {
     }
 
     const queue = [
+        getContractSourceCodeWithLocal,
         getContractSourceCode
     ];
 
@@ -54,7 +56,9 @@ export default async function handler(req: NextApiRequest) {
         try {
             result = await fallback(chainId, contractAddress);
             success = true;
-            break;
+            if (result !== null) {
+                break;
+            }
         } catch (e) {
             latestError = e;
         }
@@ -79,7 +83,7 @@ export default async function handler(req: NextApiRequest) {
                 },
             }
         ))
-    } 
+    }
 
     return cors(req, new Response(
         JSON.stringify(result),
@@ -132,7 +136,7 @@ async function getContractSourceCode(chainId: string, contractAddress: string, c
         return null;
     }
 
-    if (result.Implementation !== "" 
+    if (result.Implementation !== ""
         && result.Implementation.toLowerCase() !== contractAddress.toLowerCase()
     ) {
         // proxy contract
@@ -146,4 +150,15 @@ async function getContractSourceCode(chainId: string, contractAddress: string, c
         ABI: abi,
         Implementation: result.Implementation,
     };
+}
+
+// Get Contract Source Code for Verified Contract Source Codes
+async function getContractSourceCodeWithLocal(chainId: string, contractAddress: string, contractName?: string): Promise<Contract | null> {
+    const contract = LumiFiContracts[contractAddress.toLowerCase()];
+
+    if (!contract) {
+        return null;
+    }
+
+    return contract;
 }
