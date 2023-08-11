@@ -21,6 +21,7 @@ import StableToken from './StableToken.json';
 import UtilityStake from './UtilityStake.json';
 import UtilityToken from './UtilityToken.json';
 import VAMM from './VAMM.json';
+import Marketplace from './Marketplace.json';
 
 type ContractABI = JsonFragment;
 
@@ -151,6 +152,12 @@ LumiContracts[UtilityToken.address.toLowerCase()] = {
 LumiContracts[VAMM.address.toLowerCase()] = {
     ContractName: "Lumifi-VAMM",
     ABI: VAMM.abi,
+    Implementation: ""
+};
+
+LumiContracts[Marketplace.address.toLowerCase()] = {
+    ContractName: "Lumi-Marketplace",
+    ABI: Marketplace.abi,
     Implementation: ""
 };
 
