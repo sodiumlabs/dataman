@@ -44,8 +44,8 @@ export default async function handler(req: NextApiRequest) {
   // 如果都失败了，返回空数组并且上报错误
   const queue = [
     fallbackAnkr,
-    fallbackConvalenthq,
-    fallbackMoralis,
+    // fallbackConvalenthq,
+    // fallbackMoralis,
   ];
 
   const reportError = (e: unknown) => {
@@ -168,7 +168,7 @@ async function fallbackAnkr(chainId: string, walletAddress: string): Promise<Tok
       case "1": return "eth-mainnet";
       case "137": return "matic-mainnet";
       case "80001": return "matic-mumbai";
-      case "42161": return "aribturm";
+      case "42161": return "arbitrum";
       // bsc
       case "56": return "bsc-mainnet";
       case "97": return "bsc-testnet";
@@ -176,9 +176,10 @@ async function fallbackAnkr(chainId: string, walletAddress: string): Promise<Tok
         throw new Error(`chainId ${chainId} is not supported`);
     }
   }
-
   const chain = convertChainId2AnkrChain(chainId);
-  const result = await fetch(`${ankrAPIURL}`, {
+  console.debug("fetching ankr", `${await ankrAPIURL}`, chain)
+
+  const result = await fetch(`${await ankrAPIURL}`, {
     method: "POST",
     body: JSON.stringify({
       "jsonrpc": "2.0",
@@ -269,6 +270,7 @@ async function fallbackAnkr(chainId: string, walletAddress: string): Promise<Tok
       }[]
     },
   } = await result.json();
+  console.debug(response);
   return response.result.assets.filter(t => t.tokenType != "NATIVE" && t.balanceRawInteger != "0").map(t => {
     return {
       tokenAddress: t.contractAddress,
