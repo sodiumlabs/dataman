@@ -117,6 +117,8 @@ async function fallbackSodiumTokenList(chainId: string, tokenAddress: string): P
         decimals,
         centerData: {
             logoURI,
+
+            // @ts-ignore
             description: extensions?.description,
         }
     }
@@ -231,11 +233,16 @@ async function fallbackRpc(chainId: string, tokenAddress: string): Promise<Token
     });
     const decimalsPromise = sendERC20Call(decimalsABIencoded, (result: string) => parseInt(result, 16));
 
-    const [name, symbol, decimals] = await Promise.all([namePromise, symbolPromise, decimalsPromise]);
+    let [name, symbol, decimals] = await Promise.all([namePromise, symbolPromise, decimalsPromise]);
+
+    if (!decimals) {
+        decimals = 18;
+    }
+
     return {
         name,
         symbol,
-        decimals,
+        decimals: decimals,
         address: tokenAddress,
         centerData: {}
     }

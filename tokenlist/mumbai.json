@@ -19,16 +19,6 @@
     },
     "timestamp": "2023-02-24T13:24:45.452Z",
     "tokens": [
-        {
-            "chainId": 80001,
-            "name": "Meland.ai Testnet)",
-            "symbol": "MELD",
-            "decimals": 18,
-            "address": "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-            "logoURI": "",
-            "extensions": {
-                "description": "MeLand.ai is the first Learn-to-Earn decentralized platform where players can challenge quizzes, create quizzes, build, own and monetize their gaming experience in the Polygon blockchain."
-            }
-        }
+        
     ]
 }

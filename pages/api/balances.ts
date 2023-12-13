@@ -267,6 +267,7 @@ async function fallbackAnkr(chainId: string, walletAddress: string): Promise<Tok
         holderAddress: string,
         balance: string,
         balanceRawInteger: string,
+        tokenPrice: string,
       }[]
     },
   } = await result.json();
