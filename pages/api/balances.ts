@@ -74,9 +74,9 @@ export default async function handler(req: NextApiRequest) {
     {
       status: 200,
       headers: {
-        // cache for 2 seconds
-        // stale-while-revalidate: 4 seconds
-        'cache-control': 's-maxage=2, stale-while-revalidate=4',
+        'Cache-Control': 'max-age=2',
+        'CDN-Cache-Control': 'max-age=2',
+        'Vercel-CDN-Cache-Control': 'max-age=2',
         'content-type': 'application/json',
       },
     }
@@ -226,6 +226,7 @@ async function fallbackAlchemy(chainId: string, walletAddress: string): Promise<
   //     ]
   //   }
   // }
+  console.debug(`https://${chain}.g.alchemy.com/v2/${await alchemyAPIKeyPromise}`);
   const result = await fetch(`https://${chain}.g.alchemy.com/v2/${await alchemyAPIKeyPromise}`, {
     method: "POST",
     body: JSON.stringify({
@@ -255,6 +256,9 @@ async function fallbackAlchemy(chainId: string, walletAddress: string): Promise<
       }[]
     }
   } = await result.json();
+
+  console.debug(response);
+
   return response.result.tokenBalances.filter(t => t.tokenBalance != "0").map(t => {
     return {
       tokenAddress: t.contractAddress,
