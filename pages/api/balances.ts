@@ -259,7 +259,7 @@ async function fallbackAlchemy(chainId: string, walletAddress: string): Promise<
 
   console.debug(response);
 
-  return response.result.tokenBalances.filter(t => t.tokenBalance != "0").map(t => {
+  return response.result.tokenBalances.filter(t => t.tokenBalance != "0x0000000000000000000000000000000000000000000000000000000000000000").map(t => {
     return {
       tokenAddress: t.contractAddress,
       balance: t.tokenBalance,
