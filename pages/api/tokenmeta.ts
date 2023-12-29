@@ -177,7 +177,7 @@ async function fallbackThirdPartyTokenList(chainId: string, tokenAddress: string
     throw new Error(`Token ${tokenAddress} not found in token list`);
 }
 
-async function getRpcUrl(chainId: string): Promise<string> {
+export async function getRpcUrl(chainId: string): Promise<string> {
     const rpcMap = await get("rpcMap");
     if (rpcMap[chainId]) {
         return rpcMap[chainId];

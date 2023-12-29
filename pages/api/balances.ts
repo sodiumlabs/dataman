@@ -2,6 +2,7 @@
 import type { NextApiRequest } from 'next'
 import { get } from '@vercel/edge-config';
 import cors from '../../xcors';
+import { getRpcUrl } from './tokenmeta';
 
 export const config = {
   runtime: "edge",
@@ -44,6 +45,7 @@ export default async function handler(req: NextApiRequest) {
   const queue = [
     fallbackAnkr,
     fallbackAlchemy,
+    fallbackLumiLayer3,
     // fallbackConvalenthq,
     // fallbackMoralis,
   ];
@@ -267,110 +269,63 @@ async function fallbackAlchemy(chainId: string, walletAddress: string): Promise<
   });
 }
 
-// async function fallbackLumiLayer3(chainId: string, walletAddress: string): Promise<TokenBalances> {
-//   if (chainId != "94168") {
-//     throw new Error(`chainId ${chainId} is not supported`);
-//   }
+async function fallbackLumiLayer3(chainId: string, walletAddress: string): Promise<TokenBalances> {
+  if (chainId != "94168") {
+    throw new Error(`chainId ${chainId} is not supported`);
+  }
+  // {
+  //   "items": [
+  //     {
+  //       "token": {
+  //         "address": "0x0a67a249Dc74465fa013c79F7Bb7aAEd8E9546dd",
+  //         "circulating_market_cap": null,
+  //         "decimals": "18",
+  //         "exchange_rate": null,
+  //         "holders": "64",
+  //         "icon_url": null,
+  //         "name": "Lumi Finance USD",
+  //         "symbol": "LUAUSD",
+  //         "total_supply": "8984062996134723989789",
+  //         "type": "ERC-20"
+  //       },
+  //       "token_id": null,
+  //       "token_instance": null,
+  //       "value": "16247414979260000000"
+  //     }
+  //   ],
+  //   "next_page_params": null
+  // }
+  // https://scan-api.layerlumi.com/api/v2/addresses/0xa225f7262a654f1fe2518ab8933f1b9d8023d6df/tokens?type=ERC-20
+  const result = await fetch(`https://scan-api.layerlumi.com/api/v2/addresses/${walletAddress}/tokens?type=ERC-20`);
+  if (result.status != 200) {
+    throw new Error(`Unexpected response: ${result.status} ${result.statusText}`);
+  }
 
-//   const tokens: UserTokenInfo[] = [
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0x1DD6b5F9281c6B4f043c02A83a46c2772024636c",
-//         symbol: "LUAUSD",
-//         decimals: 18,
-//         name: "Lumi Finance USD",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0x15B6eC24f59Fea164C6e235941Aa00fB0d4A32f6",
-//         symbol: "LUAOP",
-//         decimals: 18,
-//         name: "Lumi Finance Option",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0xc3aBC47863524ced8DAf3ef98d74dd881E131C38",
-//         symbol: "LUA",
-//         decimals: 18,
-//         name: "Lumi Finance Token",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0xCb55d61E6299597C39FEeC3D4036E727aFBe11bE",
-//         symbol: "LUAG",
-//         decimals: 18,
-//         name: "Lumi Finance Governance Token",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-//         symbol: "USDT",
-//         decimals: 6,
-//         name: "USD Tether",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-//         symbol: "USDC",
-//         decimals: 6,
-//         name: "USDCoin",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-//         symbol: "USDC.e",
-//         decimals: 6,
-//         name: "USD Coin (arb1)",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//     {
-//       token: {
-//         chainId: chainId,
-//         address: "0x7f90122bf0700f9e7e1f688fe926940e8839f353",
-//         symbol: "2CRV",
-//         decimals: 18,
-//         name: "Curve 2CRV",
-//         centerData: {},
-//       },
-//       balance: BigNumber.from(0)
-//     },
-//   ];
+  const response: {
+    items: {
+      token: {
+        address: string,
+        circulating_market_cap: string,
+        decimals: string,
+        exchange_rate: string,
+        holders: string,
+        icon_url: string,
+        name: string,
+        symbol: string,
+        total_supply: string,
+        type: string,
+      },
+      token_id: string,
+      token_instance: string,
+      value: string,
+    }[],
+    next_page_params: unknown,
+  } = await result.json();
 
-//   const coins = await Promise.all(tokens.map(async t => {
-//     const contract = IERC20Metadata__factory.connect(t.token.address, provider);
-//     const balance = await contract.balanceOf(account);
-//     return {
-//       ...t,
-//       balance: balance
-//     };
-//   }));
-
-//   return coins.filter(c => c.balance.gt(0));
-// }
+  return response.items.filter(t => t.value != "0").map(t => {
+    return {
+      tokenAddress: t.token.address,
+      balance: t.value,
+    }
+  });
+}
